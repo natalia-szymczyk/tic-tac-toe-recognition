@@ -1,0 +1,44 @@
+Temat
+Kółko i krzyżyk - automatyczne rozpoznawanie stanu gry
+
+
+Autor 1, Autor 2
+
+Natalia Szymczyk, Jan Świątek
+
+
+Problem
+Na czym polega problem, który chcecie rozwiązać? Dlaczego taki problem wybraliście?
+
+Apliakcja będzie odczytywać oraz rozpoznawać stan planszy gry w kółko i krzyżyk. 
+
+
+
+Rozwiązanie
+    Jakie metody chcecie użyć?
+
+Chcemy głównie korzystać z metod przedstawionych na zajęciach. Przetwarzanie obrazu zamierzamy wykonać m.in. przy użyciu biblioteki skimage. 
+
+Jeszcze nie jesteśmy w 100% pewni jaka będzie nasza główna metoda rozpoznawania. Jednym z  pomysłów jest rozpoznawanie konturów planszy oraz znaczków, drugim pomysłem jest wylilczanie moementów Hu dla poszczególnych figur oraz poźniejsze rozpoznanie na podstawie wyniku.
+
+
+Wyniki
+    Jakie eksperymenty wykonacie, żeby zweryfikować jakość zaproponowanego algorytmu?
+
+Będziemy skanować ze zdjęć plansze rozgrywek na róznych powierzchniach, rozegranych różnymi narzędziami do pisania, pod różnymi kątami itp. 
+
+
+    Na jakich danych wykonacie eksperymenty? Jak pozyskacie te dane?
+
+Samodzielnie przygotujemy materiały do skanowania (rozegrane partie).
+
+
+    Ile będzie danych? (np. 100 zdjęć, 4 filmy o długości 3 min.)
+
+Wstępnie planujemy około 10 gier każdego typu (na różnych powierzchniach)
+
+
+    Co będzie wyznacznikiem jakości algorytmu? (np. średnia skuteczność rozpoznawania, % znalezionych obiektów, etc.)
+
+Wyznacznikiem jakości algorytmu będzie skuteczność rozpoznawania stanu gry.
+
