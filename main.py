@@ -3,6 +3,21 @@ from colorsys import hsv_to_rgb
 import numpy as np
 
 
+def contrast_correction(img):
+    equ = cv2.equalizeHist(img)
+
+    return np.hstack((img, equ))  # stacking images side-by-side
+
+
+def gamma_correction(img, gamma):
+    table = np.empty((1, 256), np.uint8)
+
+    for i in range(256):
+        table[0, i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
+
+    return cv2.LUT(img, table)
+
+
 def main(url):
     while True:
         response, img = cv2.VideoCapture(url).read()
@@ -47,7 +62,6 @@ def processing(img):
     thresh1 = cv2.morphologyEx(thresh1, cv2.MORPH_OPEN, kernel)
 
     img_inv = cv2.bitwise_not(thresh1)
-
 
     # find and draw contours. RETR_EXTERNAL retrieves only the extreme outer contours
     contours, hierarchy = cv2.findContours(img_inv, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
