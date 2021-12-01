@@ -149,6 +149,6 @@ def find_tiles(board, board_tmp):
 
 
 if __name__ == "__main__":
-    url = 'http://192.168.1.70:8080/video'
+    url = 'http://192.168.1.85 :8080/video'
     main(url)
 
