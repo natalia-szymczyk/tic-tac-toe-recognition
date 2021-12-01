@@ -69,7 +69,7 @@ class Frame(Image):
 
             cv2.imshow("1 Board", self.raw[a:b, c:d])
 
-            cv2.drawContours(self.contoured, [contour], -1, np.array(hsv_to_rgb(1 / len(contours) * j, 1, 1)) * 255.0, 5)
+            cv2.drawContours(self.contoured, [contour], -1, np.array(hsv_to_rgb(1 / len(contours) * i, 1, 1)) * 255.0, 5)
             cv2.imshow("Boards", self.raw)
             board = Board(self.raw[a:b, c:d])
             self.boards.append(board)
