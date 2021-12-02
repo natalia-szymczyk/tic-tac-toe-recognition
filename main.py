@@ -117,7 +117,8 @@ def find_boards(img, img_tmp):
         # print(i, area)
 
         if area>10000:
-            cv2.drawContours(img, [contour], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
+            # cv2.drawContours(img, [contour], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
+            cv2.drawContours(img, [contour], -1, (0, 0, 0), 5)
 
             x_min = np.min(contour[:, :, 0])
             x_max = np.max(contour[:, :, 0])
@@ -171,7 +172,7 @@ def find_tiles(board, board_tmp):
         peri = cv2.arcLength(contour, True)
         approx = cv2.approxPolyDP(contour, 0.04 * peri, True)
         (x, y, w, h) = cv2.boundingRect(approx)
-        cv2.putText(board, str(i), (x + 10, y + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
+        # cv2.putText(board, str(i), (x + 10, y + 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
 
         if area in tiles:
 
@@ -184,7 +185,8 @@ def find_tiles(board, board_tmp):
             child = hierarchy[0][i][2]
             print('rodzic: ', i, ' dzieciak: ', child)
 
-            cv2.drawContours(board, [contour], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)\
+            # cv2.drawContours(board, [contour], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
+            cv2.drawContours(board, [contours[child]], -1, (255, 255, 255), 5)
 
             # tileX, tileY = index_search(tileCount)
             # tileY = tileCount % 3
@@ -197,7 +199,7 @@ def find_tiles(board, board_tmp):
                 gamestate[tileX][tileY] = shape_recognition(contours[child])
 
             cv2.putText(board, gamestate[tileX][tileY], (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
-            cv2.putText(board, f"{tileX}, {tileY}", (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, np.array(hsv_to_rgb(i / len(contours), 1, 0.5)) * 255.0, 2)
+            # cv2.putText(board, f"{tileX}, {tileY}", (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, np.array(hsv_to_rgb(i / len(contours), 1, 0.5)) * 255.0, 2)
 
 
 
