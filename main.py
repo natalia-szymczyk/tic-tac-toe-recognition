@@ -2,28 +2,10 @@ import cv2
 from colorsys import hsv_to_rgb
 import numpy as np
 from matplotlib import pyplot as plt
-# import imutils
+import copy
 
 
-def index_search(n):
-    if n == 1:
-        return (0, 0)
-    if n == 2:
-        return (0, 1)
-    if n == 3:
-        return (0, 2)
-    if n == 4:
-        return (1, 0)
-    if n == 5:
-        return (1, 1)
-    if n == 6:
-        return (1, 2)
-    if n == 7:
-        return (2, 0)
-    if n == 8:
-        return (2, 1)
-    if n == 9:
-        return (2, 2)
+data = []
 
 
 def channel_selection(img):
@@ -80,7 +62,21 @@ def main(url):
             boards = find_boards(img, img_tmp)
 
             for [board, board_tmp] in boards:
-                find_tiles(board, board_tmp)
+                board_tiles = find_tiles(board, board_tmp)
+                data.append([board, board_tmp, board_tiles])
+
+            for i, images in enumerate(data):
+                for j, image in enumerate(images):
+                    plt.subplot(len(data), len(images), (i * len(images)) + j + 1)
+                    plt.axis('off')
+
+                    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    result = np.array(img)
+
+                    plt.imshow(result)
+
+
+            plt.show()
 
 
     cv2.destroyAllWindows()
@@ -107,18 +103,15 @@ def preprocessing(img):
 def find_boards(img, img_tmp):
     boards = []
     contours, hierarchy = cv2.findContours(img_tmp, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # print(hierarchy)
 
     for i, contour in enumerate(contours):
         child = hierarchy[0][i][2]
-        # print(hierarchy)
 
         area = cv2.contourArea(contour)
-        # print(i, area)
 
         if area>10000:
             # cv2.drawContours(img, [contour], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
-            cv2.drawContours(img, [contour], -1, (0, 0, 0), 5)
+            # cv2.drawContours(img, [contour], -1, (0, 0, 0), 5)
 
             x_min = np.min(contour[:, :, 0])
             x_max = np.max(contour[:, :, 0])
@@ -126,16 +119,6 @@ def find_boards(img, img_tmp):
             y_max = np.max(contour[:, :, 1])
 
             boards.append([np.array(img[y_min:y_max, x_min:x_max]), img_tmp[y_min:y_max, x_min:x_max]])
-
-
-    for i, img in enumerate(boards):
-        # print(type(img[0]))
-        plt.subplot(1, len(boards), i+1)
-        img = cv2.cvtColor(img[0], cv2.COLOR_BGR2RGB)
-        result = np.array(img)
-        plt.imshow(result)
-
-    plt.show()
 
     return boards
 
@@ -161,10 +144,10 @@ def find_tiles(board, board_tmp):
     contours_areas = [cv2.contourArea(contour) for contour in contours]
     contours_areas = sorted(contours_areas, reverse=True)
     tiles = contours_areas[1:10]
+    board_tiles = copy.deepcopy(board)
 
     gamestate = [["-", "-", "-"], ["-", "-", "-"], ["-", "-", "-"]]
-    img_width = board_tmp.shape[0]
-    img_height = board_tmp.shape[1]
+
     tileCount = 0
 
     for i, contour in enumerate(contours):
@@ -183,43 +166,43 @@ def find_tiles(board, board_tmp):
 
             tileCount = tileCount + 1
             child = hierarchy[0][i][2]
-            print('rodzic: ', i, ' dzieciak: ', child)
+            # print('rodzic: ', i, ' dzieciak: ', child)
 
             # cv2.drawContours(board, [contour], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
-            cv2.drawContours(board, [contours[child]], -1, (255, 255, 255), 5)
+            cv2.drawContours(board_tiles, [contours[child]], -1, (100, 100, 100), 5)
 
-            # tileX, tileY = index_search(tileCount)
-            # tileY = tileCount % 3
-            # tileY = (tileCount-1)%3
-            # tileX = (tileCount-1)//3
-            tileX = round((x / img_width) * 3)
-            tileY = round((y / img_height) * 3)
+
+            tileY = (tileCount - 1) % 3
+            tileX = (tileCount - 1) // 3
 
             if child > -1:
-                gamestate[tileX][tileY] = shape_recognition(contours[child])
+                child_area = cv2.contourArea(contours[child])
+                if not(child_area > area * 0.9 or child_area < area * 0.1):
+                    cv2.drawContours(board_tiles, [contours[child]], -1, (255, 255, 255), 5)
+                    gamestate[tileX][tileY] = shape_recognition(contours[child])
 
-            cv2.putText(board, gamestate[tileX][tileY], (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
+            # cv2.putText(board, gamestate[tileX][tileY], (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
             # cv2.putText(board, f"{tileX}, {tileY}", (x + 10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, np.array(hsv_to_rgb(i / len(contours), 1, 0.5)) * 255.0, 2)
 
 
 
-            plt.subplot(3, 3, tileCount)
-            img = cv2.cvtColor(np.array(board[y_min:y_max, x_min:x_max]), cv2.COLOR_BGR2RGB)
-            result = np.array(img)
-            plt.title(f'{tileCount}: {tileX} {tileY} = {gamestate[tileX][tileY]}')
-            plt.axis('off')
-            plt.imshow(result)
+            # plt.subplot(3, 3, tileCount)
+            # img = cv2.cvtColor(np.array(board[y_min:y_max, x_min:x_max]), cv2.COLOR_BGR2RGB)
+            # result = np.array(img)
+            # plt.title(f'{tileCount}: {tileX}
+            # {tileY} = {gamestate[tileX][tileY]}')
+            # plt.axis('off')
+            # plt.imshow(result)
 
-    plt.show()
+    # plt.show()
 
-    cv2.imshow("img board", board)
     print("Gamestate:")
-    for line in gamestate:
-        linetxt = ""
-        for cel in line:
-            linetxt = linetxt + "|" + cel
-        print(linetxt)
+    for row in gamestate:
+        print(*row, sep="|")
 
+    # cv2.imshow("img board", board)
+    # cv2.imshow("img board_tiles", board_tiles)
+    return board_tiles
 
 if __name__ == "__main__":
     url = 'http://192.168.1.77:8080/video'
