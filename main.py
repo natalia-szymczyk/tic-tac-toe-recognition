@@ -58,6 +58,7 @@ def main(url):
         if key == 27:           # ESC
             break
         elif key == 13:         # Enter
+
             img_tmp = preprocessing(img)
             boards = find_boards(img, img_tmp)
 
@@ -76,7 +77,7 @@ def main(url):
                     plt.imshow(result)
 
 
-            plt.show()
+        plt.show()
 
 
     cv2.destroyAllWindows()
