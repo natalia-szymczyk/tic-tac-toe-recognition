@@ -141,96 +141,148 @@ def main(url):
         if key == 27:           # ESC
             break
         elif key == 13:         # Enter
-            print('Enter')
             img_thresh = preprocessing(img)
-            pass
-            boards = find_boards(img, img_thresh)
-
-            for i, [board, board_thresh] in enumerate(boards):
-                # Rotate boards
-                angle = find_angle(board_thresh)
-
-                board_thresh = resize(board_thresh)
-                board_thresh = imutils.rotate(board_thresh, angle)
-
-                # cv2.imshow(f"board {i}", board)
-                # cv2.imshow(f"board thresh {i}", board_thresh)
-
-                (board_tiles, gameresult) = find_tiles(board, board_thresh)
-                print(find_game_winner(gameresult))
-                data.append([board, board_thresh, board_tiles])
-
-            for i, images in enumerate(data):
-                for j, image in enumerate(images):
-                    # cv2.imshow(f"asd{(i * len(images)) + j + 1}")
-                    plt.subplot(len(data), len(images), (i * len(images)) + j + 1)
-                    plt.axis("off")
-                    if ((i * len(images)) + j + 1) % 3 == 0:
-                        plt.title(find_game_winner(gameresult))
-
-                    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    result = np.array(img)
-
-                    plt.imshow(result)
-
-            plt.show()
+            # boards = find_boards(img, img_thresh)
+            #
+            # for i, [board, board_thresh] in enumerate(boards):
+            #     # Rotate boards
+            #     angle = find_angle(board_thresh)
+            #
+            #     board_thresh = resize(board_thresh)
+            #     board_thresh = imutils.rotate(board_thresh, angle)
+            #
+            #     # cv2.imshow(f"board {i}", board)
+            #     # cv2.imshow(f"board thresh {i}", board_thresh)
+            #
+            #     (board_tiles, gameresult) = find_tiles(board, board_thresh)
+            #     print(find_game_winner(gameresult))
+            #     data.append([board, board_thresh, board_tiles])
+            #
+            # for i, images in enumerate(data):
+            #     for j, image in enumerate(images):
+            #         # cv2.imshow(f"asd{(i * len(images)) + j + 1}")
+            #         plt.subplot(len(data), len(images), (i * len(images)) + j + 1)
+            #         plt.axis("off")
+            #         if ((i * len(images)) + j + 1) % 3 == 0:
+            #             plt.title(find_game_winner(gameresult))
+            #
+            #         img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            #         result = np.array(img)
+            #
+            #         plt.imshow(result)
+            #
+            # plt.show()
 
     cv2.destroyAllWindows()
 
 
 def preprocessing(img):
-    kernel = np.ones((3, 3), np.uint8)
-
-    img = cv2.bilateralFilter(img, 25, 75, 75)
-    plt.subplot(2, 3, 1)
-    plt.axis("off")
-    plt.title('blur1')
-    plt.imshow(img, cmap='gray')
-    # cv2.imshow('blur1', img)
-
+    img = cv2.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
+    img = cv2.bilateralFilter(img, 75, 75, 75)
     img = channel_selection(img)
-    plt.subplot(2, 3, 2)
-    plt.axis("off")
-    plt.title('channel selection')
-    plt.imshow(img, cmap='gray')
-    # cv2.imshow('channel selection', img)
+    img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 33, 3)
+    # img2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 33, 3)
+    # img = cv2.medianBlur(img, 3)
+    # img = cv2.morphologyEx(img, cv2.MORPH_DILATE, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
 
-    img = cv2.medianBlur(img, 1)
-    plt.subplot(2, 3, 3)
-    plt.axis("off")
-    plt.title('blur2')
-    plt.imshow(img, cmap='gray')
-    # cv2.imshow('blur2', img)
+    #
+    # background = cv2.morphologyEx(img, cv2.MORPH_DILATE, element)
+    # out_gray = cv2.divide(img, background, scale = 255)
+    # out_binary = cv2.threshold(out_gray, 0, 255, cv2.THRESH_OTSU)[1]
 
-    # ret, img = cv2.threshold(img, np.mean(img) / 1.2, 255, cv2.THRESH_BINARY)
-    # img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+    cv2.imshow("test1", img)
+    # cv2.imshow("test2", img2)
+
+    # img = channel_selection(img)
+    # blur = cv2.GaussianBlur(img, (0.5, 0.5), sigmaX = 1, sigmaY = 1)
+    # cv2.imshow("test1", blur)
+    # divide = cv2.divide(img, blur, scale = 255)
+    # cv2.imshow("test2", divide)
+
+
+    # img = channel_selection(img)
+    # img = cv2.getStructuringElement(cv2.MORPH_RECT, (8, 8))
+    #
+    # img = cv2.bilateralFilter(img, 25, 75, 75)
+    # img = cv2.fastNlMeansDenoisingColored(img, None, 10, 10, 10, 10)
+    # cv2.imshow("test1", img)
+    # img = channel_selection(img)
+    # cv2.imshow("test2", img)
+    # img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 3)
+    # img = cv2.medianBlur(img, 3)
+    # img = cv2.dilate(img, np.ones((3, 3), np.uint8), iterations = 1)
+
+    # kernel = np.ones((7, 7), np.uint8)
+
+
+    # img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 3, 1)
+
+    #
+    # # img = cv2.GaussianBlur(img, (5,5), 0)
+    #
+    # cv2.imshow("test1", img)
+    # img = cv2.bilateralFilter(img, 19, 75, 75)
+    # cv2.imshow("test2", img)
+    # img = cv2.blur(img, (4, 4))
+    # cv2.imshow("test3", img)
+    # img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 3)
+    # img = cv2.medianBlur(img, 3)
     # img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+    # # img = cv2.erode(img, kernel, iterations=1)
+    # img = cv2.bitwise_not(img)
+    # cv2.imshow("test4", img)
 
-    img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 8)
-    plt.subplot(2, 3, 4)
-    plt.axis("off")
-    plt.title('threshold')
-    plt.imshow(img, cmap='gray')
-    # cv2.imshow('threshhold', img)
-
-    # img = cv2.erode(img, kernel, iterations = 1)
-    img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-    plt.subplot(2, 3, 5)
-    plt.axis("off")
-    plt.title('morphology')
-    plt.imshow(img, cmap='gray')
-    # cv2.imshow('morph', img)
-
-    # img = cv2.medianBlur(img, 1)
-    # img = cv2.dilate(img, kernel, iterations = 1)
-    img = cv2.bitwise_not(img)
-    # cv2.imshow('preprocessing', img)
-    plt.subplot(2, 3, 6)
-    plt.axis("off")
-    plt.title('preprocessing')
-    plt.imshow(img, cmap='gray')
-
-    plt.show()
+    # img = cv2.bilateralFilter(img, 25, 75, 75)
+    # plt.subplot(2, 3, 1)
+    # plt.axis("off")
+    # plt.title('blur1')
+    # plt.imshow(img, cmap='gray')
+    # # cv2.imshow('blur1', img)
+    #
+    # img = channel_selection(img)
+    # plt.subplot(2, 3, 2)
+    # plt.axis("off")
+    # plt.title('channel selection')
+    # plt.imshow(img, cmap='gray')
+    # # cv2.imshow('channel selection', img)
+    #
+    # img = cv2.medianBlur(img, 7)
+    # plt.subplot(2, 3, 3)
+    # plt.axis("off")
+    # plt.title('blur2')
+    # plt.imshow(img, cmap='gray')
+    # # cv2.imshow('blur2', img)
+    #
+    # # ret, img = cv2.threshold(img, np.mean(img) / 1.2, 255, cv2.THRESH_BINARY)
+    # # img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+    # # img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+    #
+    # # ret, img = cv2.threshold(img, np.mean(img) / 1.3, 255, cv2.THRESH_BINARY)
+    # img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 31, 2)
+    # plt.subplot(2, 3, 4)
+    # plt.axis("off")
+    # plt.title('threshold')
+    # plt.imshow(img, cmap='gray')
+    # # cv2.imshow('threshhold', img)
+    #
+    # # img = cv2.erode(img, kernel, iterations = 1)
+    # img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+    # plt.subplot(2, 3, 5)
+    # plt.axis("off")
+    # plt.title('morphology')
+    # plt.imshow(img, cmap='gray')
+    # # cv2.imshow('morph', img)
+    #
+    # # img = cv2.medianBlur(img, 1)
+    # # img = cv2.dilate(img, kernel, iterations = 1)
+    # img = cv2.bitwise_not(img)
+    # # cv2.imshow('preprocessing', img)
+    # plt.subplot(2, 3, 6)
+    # plt.axis("off")
+    # plt.title('preprocessing')
+    # plt.imshow(img, cmap='gray')
+    #
+    # plt.show()
 
     return img
 
@@ -238,6 +290,7 @@ def preprocessing(img):
 def find_boards(img, img_thresh):
     boards = []
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    print(hierarchy)
 
     for i, contour in enumerate(contours):
         child = hierarchy[0][i][2]
@@ -339,6 +392,6 @@ def find_tiles(board, board_thresh):
     return board_rgb, gamestate
 
 if __name__ == "__main__":
-    url = 'http://192.168.1.15:8080/video'
+    url = 'http://192.168.1.66:8080/video'
     main(url)
 
