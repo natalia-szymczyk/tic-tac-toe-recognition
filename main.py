@@ -36,7 +36,7 @@ def channel_selection(img):
 def find_angle(board):
     contours, hierarchy = cv2.findContours(board, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_areas = [cv2.contourArea(contour) for contour in contours]
-    contours_areas = sorted(contours_areas, reverse=True)
+    contours_areas = sorted(contours_areas, reverse = True)
     tiles = contours_areas[1:10]
     centroids = []
 
@@ -142,36 +142,37 @@ def main(url):
             break
         elif key == 13:         # Enter
             img_thresh = preprocessing(img)
-            # boards = find_boards(img, img_thresh)
-            #
-            # for i, [board, board_thresh] in enumerate(boards):
-            #     # Rotate boards
-            #     angle = find_angle(board_thresh)
-            #
-            #     board_thresh = resize(board_thresh)
-            #     board_thresh = imutils.rotate(board_thresh, angle)
-            #
-            #     # cv2.imshow(f"board {i}", board)
-            #     # cv2.imshow(f"board thresh {i}", board_thresh)
-            #
-            #     (board_tiles, gameresult) = find_tiles(board, board_thresh)
-            #     print(find_game_winner(gameresult))
-            #     data.append([board, board_thresh, board_tiles])
-            #
-            # for i, images in enumerate(data):
-            #     for j, image in enumerate(images):
-            #         # cv2.imshow(f"asd{(i * len(images)) + j + 1}")
-            #         plt.subplot(len(data), len(images), (i * len(images)) + j + 1)
-            #         plt.axis("off")
-            #         if ((i * len(images)) + j + 1) % 3 == 0:
-            #             plt.title(find_game_winner(gameresult))
-            #
-            #         img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            #         result = np.array(img)
-            #
-            #         plt.imshow(result)
-            #
-            # plt.show()
+            boards = find_boards(img, img_thresh)
+
+
+            for i, [board, board_thresh] in enumerate(boards):
+                # Rotate boards
+                angle = find_angle(board_thresh)
+
+                board_thresh = resize(board_thresh)
+                board_thresh = imutils.rotate(board_thresh, angle)
+
+                # cv2.imshow(f"board {i}", board)
+                # cv2.imshow(f"board thresh {i}", board_thresh)
+
+                (board_tiles, gameresult) = find_tiles(board, board_thresh)
+                print(find_game_winner(gameresult))
+                data.append([board, board_thresh, board_tiles])
+
+            for i, images in enumerate(data):
+                for j, image in enumerate(images):
+                    # cv2.imshow(f"asd{(i * len(images)) + j + 1}")
+                    plt.subplot(len(data), len(images), (i * len(images)) + j + 1)
+                    plt.axis("off")
+                    if ((i * len(images)) + j + 1) % 3 == 0:
+                        plt.title(find_game_winner(gameresult))
+
+                    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    result = np.array(img)
+
+                    plt.imshow(result)
+
+            plt.show()
 
     cv2.destroyAllWindows()
 
@@ -181,7 +182,9 @@ def preprocessing(img):
     img = cv2.bilateralFilter(img, 75, 75, 75)
     img = channel_selection(img)
     img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 33, 3)
+
     # img2 = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 33, 3)
+
     # img = cv2.medianBlur(img, 3)
     # img = cv2.morphologyEx(img, cv2.MORPH_DILATE, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
 
@@ -190,8 +193,7 @@ def preprocessing(img):
     # out_gray = cv2.divide(img, background, scale = 255)
     # out_binary = cv2.threshold(out_gray, 0, 255, cv2.THRESH_OTSU)[1]
 
-    cv2.imshow("test1", img)
-    # cv2.imshow("test2", img2)
+    cv2.imshow("test2", img)
 
     # img = channel_selection(img)
     # blur = cv2.GaussianBlur(img, (0.5, 0.5), sigmaX = 1, sigmaY = 1)
@@ -290,22 +292,43 @@ def preprocessing(img):
 def find_boards(img, img_thresh):
     boards = []
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    print(hierarchy)
+
+    # counters = [0 for item in hierarchy[0]]
+    #
+    # for i, value in enumerate(hierarchy[0]):
+    #     if value[3] != -1:
+    #         counters[value[3]] += 1
+    #
+    # for i, item in enumerate(counters):
+    #     if item >= 9:
+    #         print(i)
+
+    # contours = contours[counters == 9]
+
+    # list_of_boards = [item[3] != -1 for item in hierarchy[0]]
+    # print(list_of_boards)
 
     for i, contour in enumerate(contours):
+        # print(contour)
         child = hierarchy[0][i][2]
 
         area = cv2.contourArea(contour)
 
-        if area>50000:
+        if area > 10000:
+            # cv2.drawContours(img, [contour], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
+            # cv2.drawContours(img, contours[child], -1, (255, 255, 255), 5)
+            # print(area)
 
             x_min = np.min(contour[:, :, 0])
             x_max = np.max(contour[:, :, 0])
             y_min = np.min(contour[:, :, 1])
             y_max = np.max(contour[:, :, 1])
 
+            # cv2.putText(img, str(counters[i]), (x_min, y_max), cv2.FONT_HERSHEY_SIMPLEX, 1.5, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
+
             boards.append([np.array(img[y_min:y_max, x_min:x_max]), img_thresh[y_min:y_max, x_min:x_max]])
             # cv2.imshow(f'board nr{i}', np.array(img[y_min:y_max, x_min:x_max]))
+    # cv2.imshow("asd", img)
 
     return boards
 
@@ -326,6 +349,9 @@ def resize(img):
 
 
 def shape_recognition(contour):
+    moments = cv2.moments(contour)
+    huMoments = cv2.HuMoments(moments)
+
     area = cv2.contourArea(contour)
     hull = cv2.convexHull(contour)
     hull_area = cv2.contourArea(hull)
@@ -335,8 +361,10 @@ def shape_recognition(contour):
 
     solidity = float(area) / hull_area
 
+    print(solidity, *huMoments)
+
     # fill the gamestate with the right sign
-    if (solidity > 0.75):
+    if solidity > 0.775:
         return "O"
     else:
         return "X"
@@ -391,7 +419,7 @@ def find_tiles(board, board_thresh):
 
     return board_rgb, gamestate
 
+
 if __name__ == "__main__":
     url = 'http://192.168.1.66:8080/video'
     main(url)
-
