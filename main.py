@@ -68,7 +68,7 @@ def find_angle(board):
         cv2.line(board_rgb, (0, b), (x_max, y_max), (255, 0, 255), thickness=3, lineType=cv2.LINE_AA)
         cv2.line(board_rgb, (0, y1), (np.shape(board)[1], y1), (150, 150, 150), thickness=3, lineType=cv2.LINE_AA)
 
-        cv2.imwrite('3.4.1-prosta.jpg', board_rgb)
+        cv2.imwrite("./cienkopisy/cienkopisy-3.4.1-prosta.jpg", board_rgb)
 
         return np.arctan(a) * 180 / 3.14
     else:
@@ -164,6 +164,7 @@ def main(url):
             boards = find_boards(img, img_thresh)
 
             for i, [board, board_thresh] in enumerate(boards):
+                # TODO len != 0
                 # Find approx angle to rotate board
                 angle = find_angle(board_thresh)
 
@@ -172,7 +173,7 @@ def main(url):
 
                 # Rotate image
                 board_thresh = imutils.rotate(board_thresh, angle)
-                cv2.imwrite("3.4.2-obrocony.jpg", board_thresh)
+                cv2.imwrite("./cienkopisy/cienkopisy-3.4.2-obrocony.jpg", board_thresh)
 
                 # Find tiles on board
                 (board_tiles, game_result) = find_tiles(board, board_thresh)
@@ -192,7 +193,7 @@ def main(url):
                 results.append(np.hstack(bases))
 
             final = np.vstack(results)
-            cv2.imwrite("summary.png", final)
+            cv2.imwrite("./cienkopisy/cienkopisy-summary.png", final)
 
 
     cv2.destroyAllWindows()
@@ -231,15 +232,15 @@ def make_same_sizes(images):
 
 
 def preprocessing(img):
-    cv2.imwrite("3.1-oryginalny.jpg", img)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.1-oryginalny.jpg", img)
     img = cv2.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
-    cv2.imwrite("3.2.1-odszumianie.jpg", img)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.2.1-odszumianie.jpg", img)
     img = cv2.bilateralFilter(img, 75, 75, 75)
-    cv2.imwrite("3.2.2-rozmywanie.jpg", img)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.2.2-rozmywanie.jpg", img)
     img = channel_selection(img)
-    cv2.imwrite("3.2.3-channel_selection.jpg", img)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.2.3-channel_selection.jpg", img)
     img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 33, 3)
-    cv2.imwrite("3.2.4-threshold.jpg", img)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.2.4-threshold.jpg", img)
 
     return img
 
@@ -273,8 +274,8 @@ def find_boards(img, img_thresh):
 
             boards.append([np.array(img[y_min:y_max, x_min:x_max]), img_thresh[y_min:y_max, x_min:x_max]])
 
-    cv2.imwrite("3.3.1-wszystkie_kontury.jpg ", img_rgb)
-    cv2.imwrite("3.3.2-plansze_kontury.jpg", img)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.3.1-wszystkie_kontury.jpg ", img_rgb)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.3.2-plansze_kontury.jpg", img)
 
     return boards
 
@@ -363,9 +364,9 @@ def find_tiles(board, board_thresh):
                 cv2.drawContours(board_rgb, [contours[child]], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
                 cv2.putText(board_rgb, gamestate[tile_y][tile_x], (x + 20, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
 
-    cv2.imwrite('3.5.1-plansza_wszystkie_kontury.jpg', screen_wszystkie)
-    cv2.imwrite('3.5.2-plansza_kafelki.jpg', screen_kafelki)
-    cv2.imwrite('3.6-plansza_ksztalty.jpg', board_rgb)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.5.1-plansza_wszystkie_kontury.jpg", screen_wszystkie)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.5.2-plansza_kafelki.jpg", screen_kafelki)
+    cv2.imwrite("./cienkopisy/cienkopisy-3.6-plansza_ksztalty.jpg", board_rgb)
 
     return board_rgb, gamestate
 
