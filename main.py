@@ -162,7 +162,6 @@ def main(url):
             boards = find_boards(img, img_thresh)
 
             for i, [board, board_thresh] in enumerate(boards):
-                # TODO len != 0
                 # Find approx angle to rotate board
                 angle = find_angle(board_thresh)
 
