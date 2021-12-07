@@ -68,7 +68,7 @@ def find_angle(board):
         cv2.line(board_rgb, (0, b), (x_max, y_max), (255, 0, 255), thickness=3, lineType=cv2.LINE_AA)
         cv2.line(board_rgb, (0, y1), (np.shape(board)[1], y1), (150, 150, 150), thickness=3, lineType=cv2.LINE_AA)
 
-        cv2.imwrite("./chusteczki/chusteczki-3.4.1-prosta.jpg", board_rgb)
+        # cv2.imwrite("./test/test-3.4.1-prosta.jpg", board_rgb)
 
         return np.arctan(a) * 180 / 3.14
     else:
@@ -111,8 +111,6 @@ def find_index(board, centroid):
                 return i, j
 
     return 0, 0
-
-    # return sorted_centroids
 
 
 def find_game_winner(game_status):
@@ -173,7 +171,7 @@ def main(url):
 
                 # Rotate image
                 board_thresh = imutils.rotate(board_thresh, angle)
-                cv2.imwrite("./chusteczki/chusteczki-3.4.2-obrocony.jpg", board_thresh)
+                # cv2.imwrite("./test/test-3.4.2-obrocony.jpg", board_thresh)
 
                 # Find tiles on board
                 (board_tiles, game_result) = find_tiles(board, board_thresh)
@@ -194,7 +192,8 @@ def main(url):
 
             if len(results) > 0:
                 final = np.vstack(results)
-                cv2.imwrite("./chusteczki/chusteczki-summary.png", final)
+                cv2.imwrite("./test/test-summary.png", final)
+                # cv2.imshow("summary", final)
 
 
     cv2.destroyAllWindows()
@@ -233,17 +232,17 @@ def make_same_sizes(images):
 
 
 def preprocessing(img):
-    cv2.imwrite("./chusteczki/chusteczki-3.1-oryginalny.jpg", img)
+    # cv2.imwrite("./test/test-3.1-oryginalny.jpg", img)
     img = cv2.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
-    cv2.imwrite("./chusteczki/chusteczki-3.2.1-odszumianie.jpg", img)
+    # cv2.imwrite("./test/test-3.2.1-odszumianie.jpg", img)
     img = cv2.bilateralFilter(img, 75, 75, 75)
-    cv2.imwrite("./chusteczki/chusteczki-3.2.2-rozmywanie.jpg", img)
+    # cv2.imwrite("./test/test-3.2.2-rozmywanie.jpg", img)
     img = channel_selection(img)
-    cv2.imwrite("./chusteczki/chusteczki-3.2.3-channel_selection.jpg", img)
+    # cv2.imwrite("./test/test-3.2.3-channel_selection.jpg", img)
     img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 33, 3)
-    cv2.imwrite("./chusteczki/chusteczki-3.2.4-threshold.jpg", img)
+    # cv2.imwrite("./test/test-3.2.4-threshold.jpg", img)
     img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
-    cv2.imwrite("./chusteczki/chusteczki-3.2.5-dilate.jpg", img)
+    # cv2.imwrite("./test/test-3.2.5-dilate.jpg", img)
 
     return img
 
@@ -276,8 +275,8 @@ def find_boards(img, img_thresh):
 
             boards.append([np.array(img[y_min:y_max, x_min:x_max]), img_thresh[y_min:y_max, x_min:x_max]])
 
-    cv2.imwrite("./chusteczki/chusteczki-3.3.1-wszystkie_kontury.jpg ", img_rgb)
-    cv2.imwrite("./chusteczki/chusteczki-3.3.2-plansze_kontury.jpg", img)
+    # cv2.imwrite("./test/test-3.3.1-wszystkie_kontury.jpg ", img_rgb)
+    # cv2.imwrite("./test/test-3.3.2-plansze_kontury.jpg", img)
 
     return boards
 
@@ -316,7 +315,6 @@ def find_tiles(board, board_thresh):
     contours_areas = sorted(contours_areas, reverse = True)
     tiles = contours_areas[1:10]
 
-    # board_tiles = copy.deepcopy(board)
     board_rgb = cv2.cvtColor(board_thresh, cv2.COLOR_GRAY2RGB)
     screen_wszystkie = cv2.cvtColor(board_thresh, cv2.COLOR_GRAY2RGB)
     screen_kafelki = cv2.cvtColor(board_thresh, cv2.COLOR_GRAY2RGB)
@@ -366,14 +364,14 @@ def find_tiles(board, board_thresh):
                 cv2.drawContours(board_rgb, [contours[child]], -1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 5)
                 cv2.putText(board_rgb, gamestate[tile_y][tile_x], (x + 20, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, np.array(hsv_to_rgb(i / len(contours), 1, 1)) * 255.0, 2)
 
-    cv2.imwrite("./chusteczki/chusteczki-3.5.1-plansza_wszystkie_kontury.jpg", screen_wszystkie)
-    cv2.imwrite("./chusteczki/chusteczki-3.5.2-plansza_kafelki.jpg", screen_kafelki)
-    cv2.imwrite("./chusteczki/chusteczki-3.6-plansza_ksztalty.jpg", board_rgb)
+    # cv2.imwrite("./test/test-3.5.1-plansza_wszystkie_kontury.jpg", screen_wszystkie)
+    # cv2.imwrite("./test/test-3.5.2-plansza_kafelki.jpg", screen_kafelki)
+    # cv2.imwrite("./test/test-3.6-plansza_ksztalty.jpg", board_rgb)
 
     return board_rgb, gamestate
 
 
 if __name__ == "__main__":
-    url = 'http://192.168.1.77:8080/video'
+    url = 'http://192.168.43.1:8080/video'
     main(url)
 
